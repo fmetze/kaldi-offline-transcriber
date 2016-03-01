@@ -1,5 +1,5 @@
 build
-kaldi-data
+*-data
 language_model
 src-audio
 steps
