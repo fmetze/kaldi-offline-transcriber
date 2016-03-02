@@ -69,7 +69,7 @@ if [ $channel -ne 0 ]; then
   channel_arg="CHANNEL_NO=$channel"
 fi
 
-(cd $BASEDIR; make -f Makefile.asr $nthreads_arg $channel_arg $filter_arg $nnet2_online_arg build/output/$basename.{txt,trs,ctm,sbv} || exit 1; if $clean ; then make -f Makefile.asr .$basename.clean; fi)
+(cd $BASEDIR; make -f Makefile $nthreads_arg $channel_arg $filter_arg $nnet2_online_arg build/output/$basename.{txt,trs,ctm,sbv} || exit 1; if $clean ; then make -f Makefile.asr .$basename.clean; fi)
 
 echo "Finished transcribing, result is in files $BASEDIR/build/output/$basename.{txt,trs,ctm,sbv}"
 

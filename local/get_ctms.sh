@@ -56,7 +56,7 @@ if [ $stage -le 0 ]; then
     mkdir -p $dir/score_ACWT/ '&&' \
     lattice-to-nbest --n=$n --acoustic-scale=ACWT --ascale-factor=$acwt_factor "ark:gunzip -c $dir/lat.*.gz|" ark:- \| \
     lattice-best-path --word-symbol-table=$symtab --acoustic-scale=ACWT --lm-scale=`echo $acwt_factor|awk '{print 1/$0}'` ark:- ark,t:- \| utils/int2sym.pl -f 2- $symtab \
-    '>' $dir/score_ACWT/$name.tra || exit 1;
+    '>' $dir/score_ACWT/$name.tra
 fi
 
 exit 0
@@ -98,4 +98,4 @@ case "$name" in eval2000* )
  ;;
 esac
 
-exit 0;
+exit 0

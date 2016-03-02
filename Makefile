@@ -25,7 +25,7 @@ njobs ?= 1
 # How many threads to use in each process
 nthreads ?= 1
 
-PATH := utils:$(KALDI_ROOT)/../eesen/src/decoderbin:$(KALDI_ROOT)/../eesen/src/nnetbin:$(KALDI_ROOT)/src/bin:$(KALDI_ROOT)/tools/openfst/bin:$(KALDI_ROOT)/src/fstbin/:$(KALDI_ROOT)/src/gmmbin/:$(KALDI_ROOT)/src/featbin/:$(KALDI_ROOT)/src/lm/:$(KALDI_ROOT)/src/sgmmbin/:$(KALDI_ROOT)/src/sgmm2bin/:$(KALDI_ROOT)/src/fgmmbin/:$(KALDI_ROOT)/src/latbin/:$(KALDI_ROOT)/src/nnetbin/:$(KALDI_ROOT)/src/nnet2bin/:$(KALDI_ROOT)/src/online2bin/:$(KALDI_ROOT)/src/kwsbin:$(KALDI_ROOT)/src/lmbin:$(PATH):$(KALDI_ROOT)/src/ivectorbin:$(PATH)
+PATH := utils:$(KALDI_ROOT)/src/decoderbin:$(KALDI_ROOT)/src/netbin:$(KALDI_ROOT)/src/featbin:$(KALDI_ROOT)/src/fstbin:$(KALDI_ROOT)/tools/openfst/bin:$(PATH)
 
 export train_cmd=run.pl
 export decode_cmd=run.pl
@@ -236,7 +236,7 @@ build/trans/%/mfcc: build/trans/%/spk2utt
 # FBANK calculation
 build/trans/%/fbank: build/trans/%/spk2utt
 	rm -rf $@
-	steps/make_fbank.sh --fbank-config conf/fbank_8kHz.conf --cmd "$$train_cmd" --nj $(njobs) \
+	steps/make_fbank_pitch.sh --fbank-config conf/fbank_8kHz.conf --cmd "$$train_cmd" --nj $(njobs) \
 		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 
@@ -323,7 +323,7 @@ build/trans/%/dnn_fbank/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 ### Decode with Eesen & 8kHz models
 build/trans/%/eesen8/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen8 && mkdir -p build/trans/$*/eesen8
-	(cd build/trans/$*/eesen8; for f in ../../../../eesen-data/train_phn_l5_c320_V2_s20_l4/*; do ln -s $$f; done)
+	(cd build/trans/$*/eesen8; for f in ../../../../eesen-data/train_phn_l5_c320/*; do ln -s $$f; done)
 	ln -s `pwd`/eesen-data/lang_phn_sw1_fsh_tgpr `pwd`/build/trans/$*/eesen8/graph
 	local/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --skip-scoring true \
 		eesen-data/lang_phn_sw1_fsh_tgpr build/trans/$* `dirname $@` || exit 1;
@@ -331,8 +331,7 @@ build/trans/%/eesen8/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 
 ### Shared part again
 %/decode/.ctm: %/decode/log
-	steps/get_ctm.sh `dirname $*` $*/graph $*/decode || \
-		local/get_ctm.sh --cmd "$$decode_cmd" \
+	local/get_ctm.sh --cmd "$$decode_cmd" \
 		$* eesen-data/lang_phn_sw1_fsh_tgpr `dirname $@`
 	local/get_ctms.sh --cmd "$$decode_cmd" \
 		$* eesen-data/lang_phn_sw1_fsh_tgpr `dirname $@`
@@ -348,8 +347,8 @@ build/trans/%.segmented.splitw2.ctm: build/trans/%/decode/.ctm
 	cat $*.splitw2.ctm > $@
 
 # cat $^ | grep -v "++" |  grep -v "\[sil\]" | grep -v -e " $$" | perl -npe 's/\+//g' > $@
-ifeq "combine" "$(DO_FILTER)"
 %.segmented.ctm: %.segmented.with-compounds.ctm
+ifeq "combine" "$(DO_FILTER)"
 	cat $^ | ./local/dofilter.sh -n > $@
 else
 	cat $^ > $@
