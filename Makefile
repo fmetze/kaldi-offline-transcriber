@@ -195,8 +195,18 @@ build/audio/base/%.wav: src-audio/%.sph
 build/diarization/%/show.seg: build/audio/base/%.wav
 	rm -rf `dirname $@`
 	mkdir -p `dirname $@`
-ifeq ($(FAKE_SEGMENTATION),yes)
+ifeq ($(FAKE_SEGMENTATION),always)
 	echo $* | awk -v a=`soxi -s $^` -v b=`soxi -r $^` ' { print $$0,1,0,int(100*a/b),"M","T","U","S0" } ' > $@;
+else ifeq ($(FAKE_SEGMENTATION),yes)
+	echo $* | awk -v a=`soxi -s $^` -v b=`soxi -r $^` ' { print int(100*a/b) } ' > $@;
+	if [ `cat $@` -gt 1000 ]; then \
+		echo THIS IS USING SEGMENTATION; cat $@; \
+		echo "$* 1 0 1000000000 U U U 1" >  `dirname $@`/show.uem.seg; \
+		./scripts/diarization.sh $^ `dirname $@`/show.uem.seg; \
+	else \
+		echo THIS IS NOT USING SEGMENTATION; \
+		echo $* | awk -v a=`soxi -s $^` -v b=`soxi -r $^` ' { print $$0,1,0,int(100*a/b),"M","T$
+	fi
 else
 	echo "$* 1 0 1000000000 U U U 1" >  `dirname $@`/show.uem.seg;
 	./scripts/diarization.sh $^ `dirname $@`/show.uem.seg;
