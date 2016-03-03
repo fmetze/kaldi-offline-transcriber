@@ -61,7 +61,7 @@ fi
 if [ $stage -le 1 ]; then
     # Remove some stuff we don't want to score, from the ctm.
     for x in $dir/score_*; do
-	cat build/trans/*/eesen8/decode/`echo $x|grep -o 'score_[0-9]*'`/*.ctm | ./steps_eesen/dofilter.sh -n | sed 's/-S[^ ]*//' | \
+	cat $dir/*/`echo $x|grep -o 'score_[0-9]*'`/*.ctm | dofilter.sh -n | sed 's/-S[^ ]*//' | \
 	    grep -i -v -E '\[NOISE|LAUGHTER|VOCALIZED-NOISE\]' | grep -i -v -E '<UNK>' > $x/$name.ctm;
 	#      grep -i -v -E '<UNK>|%HESITATION' > $x;  # hesitation is scored
     done
