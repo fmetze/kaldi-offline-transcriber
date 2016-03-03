@@ -205,7 +205,7 @@ else ifeq ($(FAKE_SEGMENTATION),yes)
 		./scripts/diarization.sh $^ `dirname $@`/show.uem.seg; \
 	else \
 		echo THIS IS NOT USING SEGMENTATION; \
-		echo $* | awk -v a=`soxi -s $^` -v b=`soxi -r $^` ' { print $$0,1,0,int(100*a/b),"M","T$
+		echo $* | awk -v a=`soxi -s $^` -v b=`soxi -r $^` ' { print $$0,1,0,int(100*a/b),"M","T","U","S0" } ' > $@; \
 	fi
 else
 	echo "$* 1 0 1000000000 U U U 1" >  `dirname $@`/show.uem.seg;
@@ -557,4 +557,4 @@ decode-address-v7/wer:
 
 # Clean everything
 clean:
-	rm -rf build/output/base/* build/output/segmented/* build/diarization/* build/trans/* build/output/* Log/*
+	rm -rf build/output/base/* build/output/segmented/* build/diarization/* build/trans/* build/output/* Log/* src-audio/*
