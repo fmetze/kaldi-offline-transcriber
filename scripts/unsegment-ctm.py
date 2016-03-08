@@ -20,7 +20,10 @@ if __name__ == '__main__':
 			file_id = m.group(1)
 				
 			start = float(m.group(2))
-			word = ss[4]
+			try:
+				word = ss[4]
+			except:
+				continue
 			score = "1"
 			if len(ss) > 5:
 					score = ss[5]
