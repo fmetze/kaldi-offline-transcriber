@@ -13,6 +13,9 @@ SID_THRESHOLD?=25
 # Should be about 3 times faster with 10% more errors
 DO_NNET2_ONLINE?=no
 
+# Pitch models (newer eesen)?
+USE_PITCH?=false
+
 # Where is Kaldi root directory?
 KALDI_ROOT?=/home/speech/tools/kaldi-trunk
 
@@ -246,8 +249,13 @@ build/trans/%/mfcc: build/trans/%/spk2utt
 # FBANK calculation
 build/trans/%/fbank: build/trans/%/spk2utt
 	rm -rf $@
+ifeq ($(USE_PITCH),yes)
+	steps/make_fbank_pitch.sh --fbank-config conf/fbank_8kHz.conf --cmd "$$train_cmd" --nj $(njobs) \
+		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
+else
 	steps/make_fbank.sh --fbank-config conf/fbank_8kHz.conf --cmd "$$train_cmd" --nj $(njobs) \
 		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
+endif
 	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 
 
@@ -335,8 +343,13 @@ build/trans/%/eesen8/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen8 && mkdir -p build/trans/$*/eesen8
 	(cd build/trans/$*/eesen8; for f in ../../../../eesen-data/train_phn_l5_c320/*; do ln -s $$f; done)
 	ln -s `pwd`/eesen-data/lang_phn_sw1_fsh_tgpr `pwd`/build/trans/$*/eesen8/graph
+ifeq($(USE_PITCH),yes)
+	local/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --skip-scoring true \
+		eesen-data/lang_phn_sw1_fsh_tgpr build/trans/$* `dirname $@` || exit 1;
+else
 	steps/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --skip-scoring true \
 		eesen-data/lang_phn_sw1_fsh_tgpr build/trans/$* `dirname $@` || exit 1;
+endif
 	# steps for non-pitch&old eesen, local for pitch&new eesen
 
 ### Shared part again
