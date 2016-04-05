@@ -343,7 +343,7 @@ build/trans/%/eesen8/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen8 && mkdir -p build/trans/$*/eesen8
 	(cd build/trans/$*/eesen8; for f in ../../../../eesen-data/train_phn_l5_c320/*; do ln -s $$f; done)
 	ln -s `pwd`/eesen-data/lang_phn_sw1_fsh_tgpr `pwd`/build/trans/$*/eesen8/graph
-ifeq($(USE_PITCH),yes)
+ifeq ($(USE_PITCH),yes)
 	local/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --skip-scoring true \
 		eesen-data/lang_phn_sw1_fsh_tgpr build/trans/$* `dirname $@` || exit 1;
 else
