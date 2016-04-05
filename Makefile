@@ -570,4 +570,4 @@ decode-address-v7/wer:
 
 # Clean everything
 clean:
-	rm -rf build/output/base/* build/output/segmented/* build/diarization/* build/trans/* build/output/* Log/* src-audio/*
+	rm -rf build/audio/base/* build/audio/segmented/* build/diarization/* build/trans/* build/output/* Log/* src-audio/*
