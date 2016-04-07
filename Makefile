@@ -28,7 +28,7 @@ njobs ?= 1
 # How many threads to use in each process
 nthreads ?= 1
 
-PATH := utils:$(KALDI_ROOT)/src/decoderbin:$(KALDI_ROOT)/src/netbin:$(KALDI_ROOT)/src/featbin:$(KALDI_ROOT)/src/fstbin:$(KALDI_ROOT)/tools/openfst/bin:$(PATH)
+PATH := utils:$(KALDI_ROOT)/src/decoderbin:$(KALDI_ROOT)/src/nnetbin:$(KALDI_ROOT)/src/netbin:$(KALDI_ROOT)/src/featbin:$(KALDI_ROOT)/src/fstbin:$(KALDI_ROOT)/tools/openfst/bin:$(PATH)
 
 export train_cmd=run.pl
 export decode_cmd=run.pl
