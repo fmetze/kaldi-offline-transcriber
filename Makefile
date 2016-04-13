@@ -28,7 +28,7 @@ njobs ?= 1
 # How many threads to use in each process
 nthreads ?= 1
 
-PATH := utils:$(KALDI_ROOT)/src/decoderbin:$(KALDI_ROOT)/src/nnetbin:$(KALDI_ROOT)/src/netbin:$(KALDI_ROOT)/src/featbin:$(KALDI_ROOT)/src/fstbin:$(KALDI_ROOT)/tools/openfst/bin:$(PATH)
+PATH := utils:$(KALDI_ROOT)/src/decoderbin:$(KALDI_ROOT)/../eesen-new/src/decoderbin:$(KALDI_ROOT)/src/nnetbin:$(KALDI_ROOT)/src/netbin:$(KALDI_ROOT)/src/featbin:$(KALDI_ROOT)/src/fstbin:$(KALDI_ROOT)/tools/openfst/bin:$(PATH)
 
 export train_cmd=run.pl
 export decode_cmd=run.pl
@@ -354,6 +354,8 @@ endif
 
 ### Shared part again
 %/decode/.ctm: %/decode/log
+	# if you want to get confidences, enable this and use eesen-new
+	#local/get_conf.sh --cmd "$$decode_cmd"
 	local/get_ctm.sh --cmd "$$decode_cmd" \
 		$* eesen-data/lang_phn_sw1_fsh_tgpr `dirname $@`
 	local/get_ctms.sh --cmd "$$decode_cmd" \
